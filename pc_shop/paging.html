@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>所有商品分页展示</title>
+		<link rel="stylesheet" href="css/paging.css" />
+	</head>
+	<body>
+		<ul class="shop" id="shop">
+	    </ul>
+	    <div class="button" id="button">
+	        <em id="ButtonPrev">上一页</em>
+	        <div class="button-center">
+	            <div id="ButtonCenter"></div>
+	        </div>
+	        <em id="ButtonNext">下一页</em>
+	    </div>
+	    
+	    <script src="js/jquery-1.12.3.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script type="text/javascript">
+	    	function showShop(page){
+	    		$.ajax({
+	    			"type": "get",
+	    			"url": "http://h6.duchengjiu.top/shop/api_goods.php?page="+page+"&pagesize=20",
+	    			"dataType": "json",
+	    			"success": function(response){
+	    				console.log(response);
+	    				 //添加分页
+				      for(var j = 0; j < response.page.page_count; j++){
+				        $('#ButtonCenter').append($('<span>'+(j+1)+'</span>'));
+				      }
+				      for (var i = 0; i < response.data.length; i++) {
+				        var obj = response.data[i];
+						$("#shop").append('<li><img src="' +obj.goods_thumb+ '" /><p><a href="detail.html?goods_id=' +obj.goods_id + '">' +obj.goods_name+ '</a></p><p>' +obj.goods_desc+ '</p><p class="price">' +obj.price+ '</p></li>');
+				      }
+	    			}
+	    		});
+			}
+	    	
+	    	$('#ButtonPrev').click(function () {
+		    page--;
+		    if(page <= 1) page = 1;
+		    $('#shop').html('');
+		    showShop(page);
+		    ButtonCenter.style.marginLeft = (page-1) * -52 + "px";
+		    
+		});
+		$('#ButtonNext').click(function () {
+		   page++;
+		   $('#shop').html('');
+		   showShop(page);
+		   ButtonCenter.style.marginLeft = (page-1) * -52 + "px";
+		   
+		});
+		$('#ButtonCenter').click(function (event) {
+		    event = event || window.event;
+		    var target = event.target || event.srcElement;
+		    if(target.nodeName === "SPAN"){
+		        page = target.innerText;
+		        $('#shop').html('');
+//		        ButtonCenter.innerHTML = null;
+		        ButtonCenter.style.marginLeft = page* -52 + "px";
+		    }
+		    showShop(page)
+		});
+	    	
+	    	
+	    	
+	    	
+	    	var page = 1;
+	    	showShop(page);
+	    </script>
+	    
+	</body>
+</html>

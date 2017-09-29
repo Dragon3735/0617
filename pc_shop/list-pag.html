@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>分类分页展示</title>
+		<link rel="stylesheet" href="css/paging.css" />
+		<!--<link rel="stylesheet" type="text/css" href="css/index.css"/>-->
+	</head>
+	<body>
+		<header>
+			<ul id="nav">
+			</ul>
+		</header>
+		<ul class="shop" id="shop">
+	    </ul>
+	    <div class="button" id="button">
+	        <em id="ButtonPrev">上一页</em>
+	        <div class="button-center">
+	            <div id="ButtonCenter"></div>
+	        </div>
+	        <em id="ButtonNext">下一页</em>
+	    </div>
+	    
+	    <script src="js/jquery-1.12.3.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script type="text/javascript">
+	    	//通过location.search获取get传参的数据 截取？后面的内容
+				var str = location.search.substr(1);
+					//用分割方法得到 = 号两边内容
+				var catId = str.split("=")
+				//判断当前是否接收到catid的参数如果有就调用
+				if(catId[1]){
+						//用下标找到id的值
+//					console.log(catId[1]);
+					
+				    var catIt1 = catId[1];
+				    
+					showShop2(1,catIt1);
+			    
+				}
+	    	
+		//页面导航；分类列表功能	    	
+	    	$.get("http://h6.duchengjiu.top/shop/api_cat.php",function(data){
+			var obj = data;
+//			console.log(obj);
+					
+			for(var i=0;i<obj.data.length;i++){
+						
+				$("#nav").append('<li cat_id=' +obj.data[i].cat_id+ '><a>' + obj.data[i].cat_name +  '</a></li>');
+			}
+			
+			$("#nav li").click(function(){
+			//通过location.search获取get传参的数据 截取？后面的内容
+				//获得当前分类的catid
+//				console.log($(this).attr("cat_id"))
+			    var catIt1 = $(this).attr("cat_id");
+			    
+				showShop2(1,catIt1);
+			})
+		})
+	    	//分页的初始值为1，调用函数
+	    	var page = 1;
+	    	showShop(page);
+	    
+	    	//页面数据添加，初始添加数据全部商品
+	    	function showShop(page){
+	    		$.ajax({
+	    			"type": "get",
+	    			"url": "http://h6.duchengjiu.top/shop/api_goods.php?page="+page+"&pagesize=20",
+	    			"dataType": "json",
+	    			"success": function(response){
+	    				console.log(response);
+	    				 //添加分页
+				      for(var j = 0; j < response.page.page_count; j++){
+				        $('#ButtonCenter').append($('<span>'+(j+1)+'</span>'));
+				      }
+				      for (var i = 0; i < response.data.length; i++) {
+				        var obj = response.data[i];
+						$("#shop").append('<li><img src="' +obj.goods_thumb+ '" /><p><a href="detail.html?goods_id=' +obj.goods_id + '">' +obj.goods_name+ '</a></p><p>' +obj.goods_desc+ '</p><p class="price">' +obj.price+ '</p></li>');
+				      }
+	    			}
+	    		});
+			}
+	    	//不循环分页按钮 
+	    	function showShop1(page){
+	    		$.ajax({
+	    			"type": "get",
+	    			"url": "http://h6.duchengjiu.top/shop/api_goods.php?page="+page+"&pagesize=20",
+	    			"dataType": "json",
+	    			"success": function(response){
+	    				console.log(response);
+				      for (var i = 0; i < response.data.length; i++) {
+				        var obj = response.data[i];
+						$("#shop").append('<li><img src="' +obj.goods_thumb+ '" /><p><a href="detail.html?goods_id=' +obj.goods_id + '">' +obj.goods_name+ '</a></p><p>' +obj.goods_desc+ '</p><p class="price">' +obj.price+ '</p></li>');
+				      }
+	    			}
+	    		});
+			}
+	    	
+	    	$('#ButtonPrev').click(function () {
+		    page--;
+		    if(page <= 1) page = 1;
+		    $('#shop').html('');
+		    showShop1(page);
+		    ButtonCenter.style.marginLeft = (page-1) * -52 + "px";
+		    
+		});
+		$('#ButtonNext').click(function () {
+		   page++;
+		   $('#shop').html('');
+		   showShop1(page);
+		   ButtonCenter.style.marginLeft = (page-1) * -52 + "px";
+		   
+		});
+		$('#ButtonCenter').click(function (event) {
+		    event = event || window.event;
+		    var target = event.target || event.srcElement;
+		    if(target.nodeName === "SPAN"){
+		        page = target.innerText;
+		        $('#shop').html('');
+//		        ButtonCenter.innerHTML = null;
+		        ButtonCenter.style.marginLeft = page* -52 + "px";
+		    }
+		    showShop1(page)
+		});
+	    	
+	    	
+	    	
+	   	//页面数据添加 
+	    	function showShop2(page,catId1){
+	    		$.ajax({
+	    			"type": "get",
+	    			"url": "http://h6.duchengjiu.top/shop/api_goods.php?cat_id=" + catId1 + "page="+page+"&pagesize=20",
+	    			"dataType": "json",
+	    			"success": function(response){
+//	    				console.log(response);
+					//清空数据后在刷新数据
+	    				$('#ButtonCenter').html('');
+	    				$('#shop').html('');
+	    				 //添加分页
+				      for(var j = 0; j < response.page.page_count; j++){
+				        $('#ButtonCenter').append($('<span>'+(j+1)+'</span>'));
+				      }
+				      for (var i = 0; i < response.data.length; i++) {
+				        var obj = response.data[i];
+						$("#shop").append('<li><img src="' +obj.goods_thumb+ '" /><p><a href="detail.html?goods_id=' +obj.goods_id + '">' +obj.goods_name+ '</a></p><p>' +obj.goods_desc+ '</p><p class="price">' +obj.price+ '</p></li>');
+				      }
+	    			}
+	    		});
+			}
+	    
+	    </script>
+	    
+	</body>
+</html>

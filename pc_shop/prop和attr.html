@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			body{
+				height: 6000px;
+			}
+			.oDiv{
+				width: 50px;
+				height: 200px;
+				background: orange;
+				position: fixed;
+				
+			}
+		</style>
+	</head>
+	<body>
+		<input type="checkbox" checked="checked"/>
+		
+		<div class="oDiv">
+			
+		</div>
+		<script src="js/jquery-1.12.3.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			
+//			$(document).click(function(){
+//			console.log( $("input").attr("checked")  );
+//			console.log( $("input").prop("checked")  );
+//				
+//			})
+		var A = $(window).height();
+		var B = $('.oDiv').height();
+		
+		function move(){
+			var target = (A - B)/2;
+			console.log(target);
+			$('.oDiv').animate({'top': target});
+		}
+		$(window).scroll(function(){
+			move();
+		})
+		
+		$(".oDiv").mouseover(function(){
+			$(".oDiv").animate({"width":400},1000);
+			
+		})
+		$(".oDiv").mouseout(function(){
+			$(".oDiv").animate({"width":50},1000);
+			
+		})
+		</script>
+	</body>
+</html>
